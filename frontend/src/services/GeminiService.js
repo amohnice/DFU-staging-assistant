@@ -5,8 +5,10 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
  */
 class GeminiService {
     constructor() {
-        this.genAI = new GoogleGenerativeAI("DUMMY_KEY"); // Mock for library initialization if needed, but we use backend
-        this.model = null;
+        // In local development, we point to the Express server on :3001
+        // In production (Vercel), we use relative paths as they share the same origin
+        this.apiBase = process.env.NODE_ENV === 'production' ? '' : 'http://localhost:3001';
+        this.genAI = null;
     }
 
     /**
@@ -18,7 +20,7 @@ class GeminiService {
      */
     async classifyUlcer(base64Image, mimeType, language = 'en') {
         try {
-            const response = await fetch('http://localhost:3001/api/classify', {
+            const response = await fetch(`${this.apiBase}/api/classify`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -51,7 +53,7 @@ class GeminiService {
      */
     async talkToAdvisor(message, context, language = 'en') {
         try {
-            const response = await fetch('http://localhost:3001/api/chat', {
+            const response = await fetch(`${this.apiBase}/api/chat`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

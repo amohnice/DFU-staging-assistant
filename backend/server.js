@@ -111,6 +111,11 @@ app.post('/api/chat', async (req, res) => {
 });
 
 
-app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
-});
+// Modified for Vercel Serverless compatibility
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(port, () => {
+        console.log(`Server running at http://localhost:${port}`);
+    });
+}
+
+export default app;

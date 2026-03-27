@@ -49,7 +49,14 @@ npm install
 npm run dev
 ```
 
-The application will be available at the URL provided by Vite (typically `http://localhost:5173`).
+## 🚀 Deployment to Vercel
+
+The project is configured for a seamless monorepo deployment on **Vercel**:
+
+1.  **Environment Variables**: In your Vercel project settings, add `GEMINI_API_KEY`.
+2.  **Deployment**: Vercel will automatically detect the `vercel.json` configuration and deploy:
+    -   The **Frontend** as a static site.
+    -   The **Backend** as Vercel Serverless Functions (via the `api/` directory).
 
 ---
 
