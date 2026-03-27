@@ -111,6 +111,17 @@ app.post('/api/chat', async (req, res) => {
 });
 
 
+// Catch-all for non-existent routes
+app.use((req, res) => {
+    res.status(404).json({ error: `Path not found: ${req.path}` });
+});
+
+// Global error handler
+app.use((err, req, res, next) => {
+    console.error('Global Server Error:', err);
+    res.status(err.status || 500).json({ error: err.message || 'Internal Server Error' });
+});
+
 // Modified for Vercel Serverless compatibility
 if (process.env.NODE_ENV !== 'production') {
     app.listen(port, () => {

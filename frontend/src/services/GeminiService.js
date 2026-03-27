@@ -7,8 +7,24 @@ class GeminiService {
     constructor() {
         // In local development, we point to the Express server on :3001
         // In production (Vercel), we use relative paths as they share the same origin
-        this.apiBase = process.env.NODE_ENV === 'production' ? '' : 'http://localhost:3001';
+        // NOTE: We check for 'production' string or undefined depending on build tool
+        const isProd = import.meta.env?.PROD || process.env.NODE_ENV === 'production';
+        this.apiBase = isProd ? '' : 'http://localhost:3001';
         this.genAI = null;
+    }
+
+    /**
+     * Helper to safely parse JSON from a response
+     */
+    async safeParseJSON(response) {
+        const contentType = response.headers.get("content-type");
+        if (contentType && contentType.includes("application/json")) {
+            return await response.json();
+        } else {
+            const text = await response.text();
+            console.error("Non-JSON response received:", text);
+            throw new Error(`Server returned non-JSON response (${response.status}). Is the backend running?`);
+        }
     }
 
     /**
@@ -33,11 +49,11 @@ class GeminiService {
             });
 
             if (!response.ok) {
-                const errorData = await response.json();
+                const errorData = await this.safeParseJSON(response);
                 throw new Error(errorData.error || 'Backend analysis failed.');
             }
 
-            return await response.json();
+            return await this.safeParseJSON(response);
         } catch (error) {
             console.error("Backend API Error:", error);
             throw new Error(error.message || "Failed to connect to backend server.");
@@ -66,13 +82,14 @@ class GeminiService {
             });
 
             if (!response.ok) {
-                throw new Error('Chat analysis failed.');
+                const errorData = await this.safeParseJSON(response);
+                throw new Error(errorData.error || 'Chat analysis failed.');
             }
 
-            return await response.json();
+            return await this.safeParseJSON(response);
         } catch (error) {
             console.error("Chat API Error:", error);
-            throw new Error("Failed to connect to advisor.");
+            throw new Error(error.message || "Failed to connect to advisor.");
         }
     }
 }
