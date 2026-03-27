@@ -1,0 +1,40 @@
+export const translations = {
+    en: {
+        title: "DFU Staging Assistant",
+        subtitle: "Early intervention tool for diabetic foot ulcer classification.",
+        upload_title: "Upload Wound Image",
+        upload_desc: "Drag and drop or click to upload a clear photo of the foot ulcer.",
+        analyzing: "Analyzing wound morphology...",
+        grade: "Wagner-Meggitt Classification",
+        risk: "Risk Level",
+        observation: "Clinical Observation",
+        recommendation: "Clinical Recommendation",
+        disclaimer: "Disclaimer: This tool is for informational and preliminary screening purposes only. It is not a substitute for professional medical advice, diagnosis, or treatment. Always seek the advice of a qualified podiatrist or physician. The analysis is performed by AI and should be verified by a medical professional.",
+        print_report: "Print Report",
+        advisor_title: "Clinical Advisor",
+        advisor_placeholder: "Ask a follow-up question about the results...",
+        common_questions: "Common Questions",
+        q1: "What does this grade mean?",
+        q2: "What is the next immediate step?",
+        q3: "How can I prevent further infection?"
+    },
+    sw: {
+        title: "Msaidizi wa Kidonda cha Kisukari",
+        subtitle: "Zana ya uingiliaji mapema kwa uainishaji wa kidonda cha mguu wa kisukari.",
+        upload_title: "Pakia Picha ya Kidonda",
+        upload_desc: "Buruta na uondoe au bonyeza ili kupakia picha wazi ya kidonda cha mguu.",
+        analyzing: "Kuchambua morphology ya wound...",
+        grade: "Uainishaji wa Wagner-Meggitt",
+        risk: "Kiwango cha Hatari",
+        observation: "Uchunguzi wa Kliniki",
+        recommendation: "Mapendekezo ya Kliniki",
+        disclaimer: "Kanusho: Zana hii ni kwa madhumuni ya habari na uchunguzi wa awali pekee. Sio mbadala wa ushauri wa kitaalamu wa matibabu, utambuzi, au matibabu. Daima tafuta ushauri wa daktari wa miguu au daktari aliyehitimu. Uchambuzi unafanywa na AI na unapaswa kuthibitishwa na mtaalamu wa matibabu.",
+        print_report: "Chapisha Ripoti",
+        advisor_title: "Mshauri wa Kliniki",
+        advisor_placeholder: "Uliza swali la kufuata kuhusu matokeo...",
+        common_questions: "Maswali ya Kawaida",
+        q1: "Daraja hili linamaanisha nini?",
+        q2: "Ni hatua gani inayofuata ya haraka?",
+        q3: "Ninawezaje kuzuia maambukizi zaidi?"
+    }
+};
