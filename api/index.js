@@ -11,107 +11,50 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json({ limit: '10mb' }));
 
+// Initialize Gemini
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
-// Diagnostic endpoint
-app.get('/api/models', async (req, res) => {
-    res.json({ message: 'Model check endpoint reachable', model: 'gemini-2.5-flash' });
+// Create a router to handle /api prefix reliably
+const router = express.Router();
+
+router.get('/models', (req, res) => {
+    res.json({ message: 'Model check reachable', model: 'gemini-2.5-flash' });
 });
 
-app.post('/api/classify', async (req, res) => {
+router.post('/classify', async (req, res) => {
     const { image, mimeType, language = 'en' } = req.body;
+    if (!image || !mimeType) return res.status(400).json({ error: 'Image and mimeType required.' });
 
-    if (!image || !mimeType) {
-        return res.status(400).json({ error: 'Image and mimeType are required.' });
-    }
-
-    const langInstruction = language === 'sw'
-        ? "Respond strictly in Swahili (Kiswahili)."
-        : "Respond strictly in English.";
-
-    const prompt = `You are a podiatric medical assistant. Analyze the foot ulcer in this image. 
-    Classify it strictly according to the Wagner-Meggitt Classification. 
-    ${langInstruction}
-    Provide the output in strict JSON format with the following keys: grade, description, risk_level, and recommendation. 
-    Do not add markdown formatting to the JSON.
-
-    Expected JSON Mapping (Translate values to the requested language):
-    - Grade 0: No ulcer, high-risk foot.
-    - Grade 1: Superficial ulcer (full thickness).
-    - Grade 2: Deep ulcer (exposed tendon/joint).
-    - Grade 3: Deep ulcer with abscess/osteomyelitis.
-    - Grade 4: Gangrene of forefoot.
-    - Grade 5: Gangrene of entire foot.
-
-    Risk Levels: Low, Moderate, High, Critical.`;
+    const langInstruction = language === 'sw' ? "Respond strictly in Swahili." : "Respond strictly in English.";
+    const prompt = `You are a podiatric medical assistant. Analyze the foot ulcer in this image. Classify it strictly according to the Wagner-Meggitt Classification. ${langInstruction} Provide JSON: grade, description, risk_level, recommendation.`;
 
     try {
-        const result = await model.generateContent([
-            prompt,
-            {
-                inlineData: {
-                    data: image.split(',')[1] || image,
-                    mimeType: mimeType
-                }
-            }
-        ]);
-
-        const response = await result.response;
-        let text = response.text();
-        text = text.replace(/```json\n?|\n?```/g, '').trim();
+        const result = await model.generateContent([prompt, { inlineData: { data: image.split(',')[1] || image, mimeType } }]);
+        const text = (await result.response).text().replace(/```json\n?|\n?```/g, '').trim();
         res.json(JSON.parse(text));
     } catch (error) {
-        console.error('Gemini API Error:', error);
-        res.status(500).json({ error: 'Failed to analyze image. Please ensure your GEMINI_API_KEY is configured in Vercel settings.' });
+        res.status(500).json({ error: 'Gemini Analysis Failed. Check Vercel API Key.' });
     }
 });
 
-app.post('/api/chat', async (req, res) => {
+router.post('/chat', async (req, res) => {
     const { message, context, language = 'en' } = req.body;
-
-    if (!message) {
-        return res.status(400).json({ error: 'Message is required.' });
-    }
-
-    const langInstruction = language === 'sw'
-        ? "Respond in Swahili (Kiswahili)."
-        : "Respond in English.";
-
-    const systemPrompt = `You are a Podiatric Clinical Advisor. 
-    You are helping a clinician understand a patient's foot ulcer results.
-    Current Context: ${JSON.stringify(context || {})}
-    ${langInstruction}
-    Provide concise, professional, and empathetic medical guidance.
-    Clearly state: "This is for informational support and should be verified by a specialist."`;
+    const langInstruction = language === 'sw' ? "Respond in Swahili." : "Respond in English.";
+    const systemPrompt = `You are a Podiatric Clinical Advisor. Context: ${JSON.stringify(context || {})}. ${langInstruction} Concise guidance only.`;
 
     try {
-        const chatModel = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
-        const chat = chatModel.startChat({
-            history: [
-                { role: "user", parts: [{ text: "Hello, I need advice on this ulcer classification." }] },
-                { role: "model", parts: [{ text: "I am ready to help. Please provide the context or ask your question." }] },
-            ],
-        });
-
+        const chat = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' }).startChat();
         const result = await chat.sendMessage(`${systemPrompt}\n\nUser Question: ${message}`);
-        const response = await result.response;
-        res.json({ reply: response.text() });
+        res.json({ reply: (await result.response).text() });
     } catch (error) {
-        console.error('Chat API Error:', error);
-        res.status(500).json({ error: 'Failed to generate a response. Please try again later.' });
+        res.status(500).json({ error: 'Assistant failed to respond.' });
     }
 });
 
-// Catch-all for non-existent routes
-app.use((req, res) => {
-    res.status(404).json({ error: `Path not found: ${req.path}` });
-});
-
-// Global error handler
-app.use((err, req, res, next) => {
-    console.error('Global Server Error:', err);
-    res.status(err.status || 500).json({ error: err.message || 'Internal Server Error' });
-});
+// Mount the router on BOTH /api and /
+// This handles cases where Vercel rewrites /api/classify to /classify or keeps the full path
+app.use('/api', router);
+app.use('/', router);
 
 export default app;
