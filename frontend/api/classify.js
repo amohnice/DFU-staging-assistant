@@ -26,7 +26,12 @@ export default async function handler(req, res) {
         const prompt = `You are a podiatric medical assistant. Analyze the foot ulcer in this image. 
         Classify it strictly according to the Wagner-Meggitt Classification. 
         ${langInstruction}
-        Provide the output in strict JSON format with the following keys: grade, description, risk_level, and recommendation. 
+        Provide the output in strict JSON format with the following keys: 
+        - grade: The Wagner Grade (e.g., "Grade 4")
+        - description: A detailed clinical observation.
+        - risk_level: A SINGLE STATUS WORD ONLY (e.g., "Low", "Moderate", "High", or "Critical"). Do not add explanations here.
+        - recommendation: Specific clinical steps.
+
         Do not add markdown formatting to the JSON.`;
 
         const result = await model.generateContent([

@@ -82,16 +82,16 @@ const ResultsCard = ({ results, imageUrl, language = 'en' }) => {
                         <h2 className="text-2xl font-black tracking-tight">{grade || 'N/A'}</h2>
                     </div>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3 text-right">
                     <span className={cn(
-                        "px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider border whitespace-nowrap",
+                        "px-4 py-1.5 rounded-2xl text-xs font-black uppercase tracking-wider border leading-tight text-center sm:max-w-[240px]",
                         getRiskStyles(risk_level)
                     )}>
                         {risk_level || 'Unknown'} {t.risk}
                     </span>
                     <button
                         onClick={handlePrint}
-                        className="p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors print:hidden"
+                        className="p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors print:hidden self-end sm:self-auto"
                         title={t.print_report}
                     >
                         <Printer className="w-5 h-5 text-white" />

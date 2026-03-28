@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Stethoscope, AlertCircle, Info, Languages } from 'lucide-react'
+import { Stethoscope, AlertCircle, Info } from 'lucide-react'
 
 import UploadZone from './components/UploadZone'
 import ResultsCard from './components/ResultsCard'
@@ -12,7 +12,7 @@ import { translations } from './utils/translations'
 function App() {
   const [language, setLanguage] = useState('en')
   const [selectedImage, setSelectedImage] = useState(null)
-  const [originalFile, setOriginalFile] = useState(null)
+  const [, setOriginalFile] = useState(null)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [results, setResults] = useState(null)
   const [error, setError] = useState(null)
@@ -28,7 +28,7 @@ function App() {
     reader.onload = (e) => setSelectedImage(e.target.result)
     reader.readAsDataURL(file)
 
-    analyzeImage(file)
+    await analyzeImage(file)
   }
 
   const analyzeImage = async (file) => {
@@ -139,7 +139,7 @@ function App() {
       {results && <AdvisorChat context={results} language={language} />}
 
       <footer className="max-w-3xl w-full mt-20 pb-12 text-center">
-        <div className="h-px w-full bg-gradient-to-r from-transparent via-slate-200 to-transparent mb-12"></div>
+        <div className="h-px w-full bg-linear-to-r from-transparent via-slate-200 to-transparent mb-12"></div>
         <p className="text-[10px] text-slate-400 uppercase tracking-[0.2em] mb-4 font-black">Clinical Disclaimer</p>
         <p className="text-sm text-slate-500 leading-relaxed max-w-2xl mx-auto font-medium">
           {t.disclaimer}
